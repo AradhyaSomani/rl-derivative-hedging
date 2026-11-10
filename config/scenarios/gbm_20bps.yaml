@@ -1,0 +1,15 @@
+name: gbm_20bps
+market:
+  model: gbm
+  s0: 100.0
+  mu: 0.0       # drift = interest rate, so hedging gains have zero mean
+  sigma: 0.2
+  r: 0.0
+option:
+  kind: call
+  moneyness: 1.0   # K / S0
+  maturity_days: 30
+grid:
+  steps_per_day: 1
+  days_per_year: 252
+cost_bps: 20

@@ -1,0 +1,3 @@
+name: bs_delta
+kind: bs_delta
+# Volatility input: the true sigma on GBM, sqrt(current variance) on Heston.

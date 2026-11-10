@@ -1,0 +1,6 @@
+name: no_trade_band
+kind: no_trade_band
+# Grid searched on validation paths for each scenario; the setting with the lowest CVaR 95% wins.
+# Width is in shares per option. Width 0 is the plain delta hedge.
+widths: [0.0, 0.005, 0.01, 0.015, 0.02, 0.03, 0.04, 0.05, 0.075, 0.1, 0.15]
+rebalance_to: [delta, edge]

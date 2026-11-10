@@ -1,0 +1,126 @@
+# Pre-registration
+
+**Status: DRAFT, not yet tagged.** Aradhya reviews this, settles the items in section 8, then
+commits and tags `prereg-v1`. After the tag, sections 1 to 6 change only through a dated entry
+in section 9.
+
+## 1. Questions
+
+1. With proportional transaction costs, does an RL agent achieve lower tail loss (CVaR 95%)
+   than Black-Scholes delta hedging and a no-trade-band hedge, at the same or lower average
+   cost?
+2. When prices follow Heston but the baseline assumes Black-Scholes, how much of the RL
+   agent's gain comes from learning around the wrong model?
+3. Does model-free RL (PPO, SAC) match deep hedging, which optimises the hedging loss directly
+   through the simulator?
+
+## 2. Setting
+
+The hedger has sold one European call and trades the underlying once a day until expiry.
+
+| Item | Value |
+| --- | --- |
+| Option | Short European call, at the money (K = S0 = 100), 30 trading days to expiry |
+| Rebalancing | Daily: 30 steps, dt = 1/252 year |
+| Holding | Between 0 and 1 share per option |
+| Costs | Proportional: cost rate times traded value, on every trade including opening and closing |
+| Interest rate | 0 |
+| Drift | 0 (equal to the interest rate), so no strategy can earn a risk premium by under-hedging |
+| Premium | The option's fair price in the scenario's own model: Black-Scholes on GBM, semi-analytic Heston on Heston |
+
+Hedging P&L per path, with holdings h, h before time 0 and at expiry both 0:
+
+    P&L = premium - max(S_T - K, 0) + sum_{t<T} h_t (S_{t+1} - S_t) - sum_{t<=T} rate * S_t * |h_t - h_{t-1}|
+
+Hedging cost is minus the P&L. All strategies are scored by the one function
+`hedge.pnl.hedge_pnl`.
+
+## 3. Scenarios
+
+Two markets times four cost levels, eight scenarios, each a file in `config/scenarios/`.
+
+| Market | Parameters |
+| --- | --- |
+| GBM | volatility 20% |
+| Heston | v0 = 0.04, kappa = 2.0, theta = 0.04, xi = 0.3, rho = -0.7; Euler with full truncation, 8 sub-steps per day |
+
+Cost levels: 0, 5, 10 and 20 bps of traded value.
+
+## 4. Seeds and splits
+
+One seed makes one path (`hedge.seeds`). The same seeds are used in every scenario.
+
+| Split | Seeds | Paths | Used for |
+| --- | --- | --- | --- |
+| Test | 10,000 to 19,999 | 10,000 | Scored once, after the `agents-frozen` tag |
+| Validation | 20,000 to 29,999 | 10,000 | Reward choice, tuning, early stopping, band width |
+| Train | 100,000 to 199,999 | 100,000 | Training only |
+| Dev | 0 to 9,999 | | Unit tests, notebooks, the demo |
+
+The simulators refuse test seeds unless explicitly allowed, and a unit test fails if the
+ranges overlap. RL and deep hedging training seeds: 0, 1, 2, 3, 4.
+
+## 5. Strategies
+
+- No hedge.
+- Black-Scholes delta, rebalanced every step, using the true volatility on GBM and the square
+  root of the current variance on Heston (the misspecified hedge).
+- No-trade band around that delta. Width and whether to trade to delta or to the band edge
+  are chosen per scenario for lowest validation CVaR 95%, from the grid in
+  `config/agents/no_trade_band.yaml`.
+- PPO and SAC (TD3 optional), two hidden layers of 64, rewards `quadratic`, `mean_variance`
+  and `terminal_cvar` with lambda in {0.1, 0.5, 1, 2}, chosen on validation paths.
+- Deep hedging network trained on CVaR 95% of the P&L, early-stopped on validation CVaR.
+
+## 6. Metrics and what counts as support
+
+Computed on hedging cost over the 10,000 test paths of each scenario.
+
+| Metric | Definition |
+| --- | --- |
+| Mean cost | Average hedging cost |
+| Std of cost | Sample standard deviation |
+| CVaR 95% | Mean of the worst 5% of costs (the worst 500 of 10,000) |
+| Transaction cost | Mean total cost paid per path |
+| Turnover | Mean shares traded per path, including opening and closing |
+| Seed spread | Range of CVaR across the 5 training seeds |
+
+Headline metrics are CVaR 95% and standard deviation; mean cost is always reported beside
+them. Every RL number is the median of 5 training seeds with the range.
+
+| Claim | Test | Counts as support |
+| --- | --- | --- |
+| RL lowers tail risk under costs | CVaR 95%, RL vs BS delta, GBM at 10 bps | Bootstrap 95% CI of the difference excludes 0, median over 5 seeds |
+| RL is not just a smarter band | RL vs tuned no-trade band, same scenario | CVaR lower and mean cost no higher |
+| Gains grow when the model is wrong | RL gain over delta on Heston vs on GBM | Larger gain on Heston, CIs not overlapping |
+| RL matches deep hedging | CVaR of PPO/SAC vs deep hedging | Within 5% of deep hedging's CVaR |
+| The agent generalises | Agent trained at 10 bps, tested at 5 and 20 bps | Still beats delta at both |
+
+Null results and failed rewards or settings are reported in `docs/results.md`.
+
+## 7. Stress tests (after the main test run)
+
+Train at 20% volatility and test at 10% and 30%; train on GBM and test on Heston; rare jumps
+added to test paths only.
+
+## 8. Defaults chosen while building, for Aradhya to confirm before tagging
+
+1. **Heston base parameters** (section 3). A common textbook-style set that satisfies the
+   Feller condition; it is not taken from a specific paper. The deep hedging paper's own set
+   could be used instead.
+2. **Second contract for the check: a put**, same strike and maturity. The engine and
+   baselines already support it (`option.kind: put`).
+3. **Interest rate 0 in v1.** Scenario configs with a non-zero rate are rejected.
+4. **Drift 0.** Keeps mean hedging cost equal to transaction cost, so mean and risk are easy
+   to read. A positive drift is a possible later stress test.
+5. **Trading-day clock**: 30 trading days, 252 per year.
+6. **Train, validation and dev seed ranges.** Only the test range came from the task list.
+7. **Baselines before the freeze are scored on validation paths**, not test paths, so the
+   test set really is opened once. The task list's Phase 1 says to run them on test paths.
+8. **Path files are keyed by a hash of the market, maturity and time grid** rather than the
+   whole scenario, so the four cost levels share one file.
+9. **The band may trade to its edge** as well as to delta; the choice is tuned with the width.
+
+## 9. Changes after the tag
+
+None.

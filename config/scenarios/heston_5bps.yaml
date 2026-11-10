@@ -1,0 +1,20 @@
+name: heston_5bps
+market:
+  model: heston
+  s0: 100.0
+  mu: 0.0       # drift = interest rate, so hedging gains have zero mean
+  r: 0.0
+  v0: 0.04      # starting variance (20% volatility)
+  kappa: 2.0    # speed of mean reversion
+  theta: 0.04   # long-run variance
+  xi: 0.3       # volatility of variance
+  rho: -0.7     # correlation of price and variance shocks
+  substeps_per_day: 8
+option:
+  kind: call
+  moneyness: 1.0   # K / S0
+  maturity_days: 30
+grid:
+  steps_per_day: 1
+  days_per_year: 252
+cost_bps: 5
