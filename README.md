@@ -6,12 +6,15 @@
 money and the market model is wrong? I tested it on 10,000 held-out paths per scenario,
 set aside before any training and scored only after the setup was frozen in git.**
 
+[![Live demo](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://rl-derivative-hedging.streamlit.app/)
 [![CI](https://github.com/AradhyaSomani/rl-derivative-hedging/actions/workflows/ci.yml/badge.svg)](https://github.com/AradhyaSomani/rl-derivative-hedging/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.10%20%7C%203.12-blue)
 ![Tests](https://img.shields.io/badge/tests-121-brightgreen)
 ![PyTorch](https://img.shields.io/badge/PyTorch-deep%20hedging-ee4c2c)
 ![Stable-Baselines3](https://img.shields.io/badge/SB3-PPO%20%7C%20SAC-6f42c1)
 ![Preregistered](https://img.shields.io/badge/evaluation-preregistered-success)
+
+**[Try the live demo](https://rl-derivative-hedging.streamlit.app/)**
 
 </div>
 
@@ -289,16 +292,16 @@ it adds nothing. The experiments that led to the frozen setup can be rerun from
 
 ## Live demo, API and database
 
-<!-- TODO(Aradhya): replace both placeholders once the demo is hosted and the video is recorded. -->
+<!-- TODO(Aradhya): add the demo video link once it is recorded. -->
 
-- **Hosted demo:** _coming soon (link to be added)_
+- **Live demo:** <https://rl-derivative-hedging.streamlit.app/>
 - **Demo video:** _coming soon (link to be added)_
 
 The Streamlit app has five pages: a race between two hedgers on one path, cost
 distributions over 10,000 paths, the cost against tail-risk frontier with the stress tests,
 a "try it" page where you change cost and volatility and the frozen agents hedge fresh
 paths live, and a plain-English summary. To host it (for example on Streamlit Community
-Cloud), point it at `app/streamlit_app.py` with `app/requirements.txt`.
+Cloud, as the live demo is), point it at `app/streamlit_app.py` with `app/requirements.txt`.
 
 ```bash
 createdb hedging
