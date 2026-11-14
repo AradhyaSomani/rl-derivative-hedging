@@ -26,6 +26,11 @@ the test numbers.
 3. **Does model-free RL match deep hedging?** No. PPO's CVaR is 18% to 22% higher than deep
    hedging's at 10 and 20 basis points, far outside the 5% set as a match beforehand.
 
+**Caveat on SAC.** SAC had a much smaller budget than PPO (100,000 steps against 1,000,000),
+default hyperparameters with no search, and ran on two scenarios only (GBM and Heston at
+10 bps). Its failure to beat delta and the band holds under that small budget; it is not
+evidence that SAC could not do better with more steps, tuning or scenarios.
+
 One line: the method that optimises the tail of the whole episode directly wins, and
 step-by-step RL with a per-step reward gives a cheaper but not a safer hedge than the textbook
 rule.

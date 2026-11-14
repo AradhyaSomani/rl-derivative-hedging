@@ -167,6 +167,9 @@ CVaR 95% at 10 basis points on the test paths (lower is better):
 - **Everything is simulated.** One option, one maturity, daily trading, two models. A real
   market has no known model to train on, which is exactly where deep hedging's requirement
   is hardest to meet.
+- **The interest rate is zero** (section 8, item 3 of the preregistration), and the drift is
+  zero with it. A positive rate would add financing of the stock position and discounting of
+  the payoff, and was not tested.
 - **The RL tuning was modest:** one search of 30 trials, on GBM only. A bigger effort might
   close some of the gap.
 - **The agents start from delta** and can move at most 0.25 shares from it, so this measures

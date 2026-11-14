@@ -180,3 +180,19 @@ added to test paths only.
 - **2026-11-14, code change after the tag.** `python -m hedge.cli export-sample` now empties
   `app/sample` before writing, so the demo's sample holds only the test results. This does
   not touch any result.
+- **2026-11-14, review of section 8.** Aradhya reviewed section 8 and confirmed items 1 to 12
+  as written. It is not recorded whether this review happened before or after the
+  `prereg-v1` and `agents-frozen` tags were made, so it should not be read as a check made
+  before tagging.
+- **2026-11-14, what items 13 to 21 are.** Items 13 to 21 were written after the validation
+  results had been seen. They describe choices that were made with those results in view, so
+  they are a record, not a prediction. The two most exposed to being fitted to the results
+  are item 13 (the delta-offset action, chosen because it scored better on validation) and
+  item 19 (the 5% threshold for "matches deep hedging", set when the validation gap was
+  already known). The test paths had not been generated or scored when any of them was
+  written.
+- **2026-11-14, planned exploratory stress test.** After the final test run, the stress tests
+  will be repeated with Heston paths drawn from the parameter set used in the deep hedging
+  paper (Buehler et al., 2019) in place of the textbook-style set in section 3. This was
+  decided after the test results were known, so it is post hoc and will be labelled
+  exploratory wherever it is reported. It changes no agent, setting or headline number.
