@@ -1,0 +1,13 @@
+{
+  "strategy": "ppo_tuned_quadratic_l1",
+  "scenario": "gbm_5bps",
+  "seed": 0,
+  "n_paths": 10000,
+  "mean_cost": 0.12596636465036665,
+  "std_cost": 0.45012789509175016,
+  "var95": 0.9098213336291459,
+  "cvar95": 1.2157534059634716,
+  "mean_txn_cost": 0.12836410898662967,
+  "mean_turnover": 2.540792715859794,
+  "split": "validation"
+}

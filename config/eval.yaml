@@ -1,0 +1,33 @@
+# What gets scored in the final evaluation and the stress tests.
+# The learned strategies are the ones frozen by the `agents-frozen` tag.
+learned:
+  - strategy: ppo_tuned_quadratic_l1
+    label: PPO
+  - strategy: sac_quadratic_l1
+    label: SAC
+  - strategy: deep_hedging
+    label: Deep hedging
+seeds: [0, 1, 2, 3, 4]
+bootstrap:
+  n_resamples: 2000
+  seed: 0
+  level: 0.95
+
+# Stress tests: agents and baselines keep everything they learned or assumed in the base
+# scenario (premium, the volatility inside BS delta); only the paths change.
+stress:
+  vol_up:
+    base: config/scenarios/gbm_10bps.yaml
+    market: {sigma: 0.30}
+  vol_down:
+    base: config/scenarios/gbm_10bps.yaml
+    market: {sigma: 0.10}
+  model_swap:
+    base: config/scenarios/gbm_10bps.yaml
+    paths_from: config/scenarios/heston_10bps.yaml
+  jumps_gbm:
+    base: config/scenarios/gbm_10bps.yaml
+    jumps: {intensity: 2.0, mean: -0.05, std: 0.08}   # per year; log jump size
+  jumps_heston:
+    base: config/scenarios/heston_10bps.yaml
+    jumps: {intensity: 2.0, mean: -0.05, std: 0.08}

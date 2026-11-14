@@ -1,0 +1,7 @@
+# Phase 2A option, compared in Phase 3: the action is a change from BS delta instead of a raw holding.
+name: action_offset
+agent: config/agents/ppo_offset.yaml
+scenarios: [config/scenarios/gbm_10bps.yaml]
+seeds: [0]
+rewards: [quadratic]
+lams: [0.1, 0.5, 1, 2]

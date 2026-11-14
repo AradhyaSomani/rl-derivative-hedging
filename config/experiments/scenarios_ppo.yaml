@@ -1,0 +1,13 @@
+# Phase 3D and 3E: the chosen setup, 5 training seeds, every scenario.
+name: scenarios_ppo
+agent: config/agents/ppo_tuned.yaml
+scenarios:
+  - config/scenarios/gbm_0bps.yaml
+  - config/scenarios/gbm_5bps.yaml
+  - config/scenarios/gbm_10bps.yaml
+  - config/scenarios/gbm_20bps.yaml
+  - config/scenarios/heston_0bps.yaml
+  - config/scenarios/heston_5bps.yaml
+  - config/scenarios/heston_10bps.yaml
+  - config/scenarios/heston_20bps.yaml
+seeds: [0, 1, 2, 3, 4]

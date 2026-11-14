@@ -1,0 +1,13 @@
+{
+  "strategy": "deep_hedging",
+  "scenario": "heston_20bps",
+  "seed": 2,
+  "n_paths": 10000,
+  "mean_cost": 0.4447865245248531,
+  "std_cost": 0.5991455110911128,
+  "var95": 1.375775261975563,
+  "cvar95": 1.6424816720095876,
+  "mean_txn_cost": 0.45550351365313163,
+  "mean_turnover": 2.253286853734997,
+  "split": "validation"
+}

@@ -1,0 +1,13 @@
+{
+  "strategy": "ppo_tuned_quadratic_l1",
+  "scenario": "heston_0bps",
+  "seed": 2,
+  "n_paths": 10000,
+  "mean_cost": -0.007987041558866093,
+  "std_cost": 0.5320089612935311,
+  "var95": 0.9070285853615253,
+  "cvar95": 1.2788334475597962,
+  "mean_txn_cost": 0.0,
+  "mean_turnover": 2.699000079865921,
+  "split": "validation"
+}

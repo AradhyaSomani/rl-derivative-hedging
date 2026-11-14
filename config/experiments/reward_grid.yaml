@@ -1,0 +1,7 @@
+# Phase 3C: every reward at every lambda, PPO on GBM at 10 bps, judged on validation paths.
+name: reward_grid
+agent: config/agents/ppo.yaml
+scenarios: [config/scenarios/gbm_10bps.yaml]
+seeds: [0]
+rewards: [quadratic, mean_variance, terminal_cvar]
+lams: [0.1, 0.5, 1, 2]

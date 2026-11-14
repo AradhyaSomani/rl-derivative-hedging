@@ -1,0 +1,13 @@
+{
+  "strategy": "sac_quadratic_l1",
+  "scenario": "gbm_10bps",
+  "seed": 3,
+  "n_paths": 10000,
+  "mean_cost": 0.24424107152153365,
+  "std_cost": 0.4811290160713195,
+  "var95": 1.06376209740215,
+  "cvar95": 1.3981319594486035,
+  "mean_txn_cost": 0.2460816387097152,
+  "mean_turnover": 2.4344392345126113,
+  "split": "validation"
+}

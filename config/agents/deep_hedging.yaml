@@ -1,0 +1,16 @@
+# Deep hedging: one network, trained on CVaR 95% of the hedging cost through the P&L engine.
+# Same observation, action and network size as the RL agents.
+name: deep_hedging
+algo: deep_hedging
+total_steps: 1000          # maximum gradient steps; it usually stops early
+net_arch: [64, 64]
+hyperparams:
+  learning_rate: 1.0e-3
+  batch_size: 5000         # paths per gradient step, drawn from the train set
+  patience: 6              # stop after this many validation checks without improvement
+  loss: cvar               # cvar | entropic
+  alpha: 0.95
+env:
+  action_mode: delta_offset
+  max_offset: 0.25
+eval_every: 50             # gradient steps between validation checks

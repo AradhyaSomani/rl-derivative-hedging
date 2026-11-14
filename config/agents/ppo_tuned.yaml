@@ -1,0 +1,18 @@
+# PPO with the delta-offset action and the hyperparameters found by the Optuna search
+# (config/experiments/tune_ppo_offset.yaml, trial 23, rounded).
+name: ppo_tuned
+algo: ppo
+total_steps: 1000000
+n_envs: 8
+net_arch: [64, 64]
+hyperparams:
+  learning_rate: 4.7e-5
+  ent_coef: 2.9e-8
+  gamma: 0.925
+reward:
+  name: quadratic
+  lam: 1.0
+env:
+  action_mode: delta_offset
+  max_offset: 0.25
+eval_every: 50000

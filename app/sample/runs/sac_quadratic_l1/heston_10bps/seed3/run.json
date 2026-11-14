@@ -1,0 +1,37 @@
+{
+  "agent": {
+    "name": "sac",
+    "algo": "sac",
+    "total_steps": 100000,
+    "n_envs": 1,
+    "net_arch": [
+      64,
+      64
+    ],
+    "hyperparams": {},
+    "reward": {
+      "name": "quadratic",
+      "lam": 1.0
+    },
+    "env": {
+      "action_mode": "delta_offset",
+      "max_offset": 0.25
+    },
+    "eval_every": 10000,
+    "vec_env": "dummy"
+  },
+  "agent_hash": "f4430bd3e9",
+  "reward": {
+    "name": "quadratic",
+    "lam": 1.0,
+    "alpha": 0.95,
+    "threshold": 0.0
+  },
+  "scenario": "heston_10bps",
+  "scenario_hash": "590396ad33",
+  "paths_hash": "523b0c4cea",
+  "seed": 3,
+  "total_steps": 100000,
+  "wall_time_s": 485.0,
+  "code_commit": "9498b4e"
+}

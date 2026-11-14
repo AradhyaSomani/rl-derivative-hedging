@@ -1,1 +1,1 @@
-"""Built in Phase 2."""
+"""The hedging environment (gymnasium) and its rewards."""

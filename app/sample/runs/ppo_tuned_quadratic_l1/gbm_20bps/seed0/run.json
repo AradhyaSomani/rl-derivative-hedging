@@ -1,0 +1,41 @@
+{
+  "agent": {
+    "name": "ppo_tuned",
+    "algo": "ppo",
+    "total_steps": 1000000,
+    "n_envs": 8,
+    "net_arch": [
+      64,
+      64
+    ],
+    "hyperparams": {
+      "learning_rate": 4.7e-05,
+      "ent_coef": 2.9e-08,
+      "gamma": 0.925
+    },
+    "reward": {
+      "name": "quadratic",
+      "lam": 1.0
+    },
+    "env": {
+      "action_mode": "delta_offset",
+      "max_offset": 0.25
+    },
+    "eval_every": 50000,
+    "vec_env": "dummy"
+  },
+  "agent_hash": "888927f7a8",
+  "reward": {
+    "name": "quadratic",
+    "lam": 1.0,
+    "alpha": 0.95,
+    "threshold": 0.0
+  },
+  "scenario": "gbm_20bps",
+  "scenario_hash": "6227d24724",
+  "paths_hash": "c476fb47b4",
+  "seed": 0,
+  "total_steps": 1015808,
+  "wall_time_s": 458.9,
+  "code_commit": "9498b4e"
+}

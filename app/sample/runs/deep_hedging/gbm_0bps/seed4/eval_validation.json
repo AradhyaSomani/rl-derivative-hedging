@@ -1,0 +1,13 @@
+{
+  "strategy": "deep_hedging",
+  "scenario": "gbm_0bps",
+  "seed": 4,
+  "n_paths": 10000,
+  "mean_cost": -0.0022595087441889517,
+  "std_cost": 0.47924017538114744,
+  "var95": 0.6862756484413067,
+  "cvar95": 0.8821359662977271,
+  "mean_txn_cost": 0.0,
+  "mean_turnover": 2.5509014377318433,
+  "split": "validation"
+}

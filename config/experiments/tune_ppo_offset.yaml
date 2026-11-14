@@ -1,0 +1,12 @@
+# Phase 3D: small hyperparameter search on validation CVaR 95%, capped at 30 trials.
+name: tune_ppo_offset
+agent: config/agents/ppo_offset.yaml
+scenario: config/scenarios/gbm_10bps.yaml
+seed: 0
+n_trials: 30
+reward: {name: quadratic, lam: 1.0}
+search:
+  learning_rate: {low: 1.0e-5, high: 1.0e-3, log: true}
+  ent_coef: {low: 1.0e-8, high: 1.0e-2, log: true}
+  gamma: {low: 0.9, high: 1.0}
+  lr_schedule: [constant, linear]

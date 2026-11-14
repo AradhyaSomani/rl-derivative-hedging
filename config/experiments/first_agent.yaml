@@ -1,0 +1,5 @@
+# Phase 3A: one PPO agent on the easiest case, default hyperparameters.
+name: first_agent
+agent: config/agents/ppo.yaml
+scenarios: [config/scenarios/gbm_10bps.yaml]
+seeds: [0]

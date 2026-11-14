@@ -1,0 +1,13 @@
+# For hosting the demo (for example Streamlit Community Cloud). The app adds src/ to the
+# import path itself, so the package does not need installing. CPU-only PyTorch.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch>=2.2
+numpy>=1.26
+scipy>=1.11
+pandas>=2.1
+pyarrow>=14
+pyyaml>=6
+gymnasium>=0.29
+stable-baselines3>=2.3
+streamlit>=1.50
+altair>=5

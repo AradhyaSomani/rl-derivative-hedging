@@ -1,0 +1,7 @@
+# Re-check lambda with the tuned hyperparameters before fixing the setup.
+name: tuned_lams
+agent: config/agents/ppo_tuned.yaml
+scenarios: [config/scenarios/gbm_10bps.yaml]
+seeds: [0]
+rewards: [quadratic]
+lams: [0.1, 0.5, 1, 2]

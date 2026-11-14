@@ -1,1 +1,1 @@
-"""Built in Phase 3."""
+"""Scripted sanity agents now; trained agents from Phase 3."""

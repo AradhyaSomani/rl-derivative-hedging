@@ -1,10 +1,11 @@
 PY ?= python
+JOBS ?= 4
 SCENARIOS := $(wildcard config/scenarios/*.yaml)
 
-.PHONY: install test lint paths baselines train eval report app all
+.PHONY: install test lint paths baselines train eval stress final-test report db api app all
 
 install:
-	$(PY) -m pip install -e ".[dev]"
+	$(PY) -m pip install -e ".[dev,rl,serve]"
 	pre-commit install
 
 test:
@@ -13,7 +14,7 @@ test:
 lint:
 	ruff check . && ruff format --check .
 
-# Train and validation paths only. Test paths are generated once, by `make eval`.
+# Train and validation paths only. Test paths are generated once, by `make final-test`.
 paths:
 	@for s in $(SCENARIOS); do $(PY) -m hedge.cli paths --scenario $$s --splits train validation || exit 1; done
 
@@ -21,16 +22,38 @@ paths:
 baselines:
 	$(PY) -m hedge.cli baselines --scenarios $(SCENARIOS) --split validation
 
+# The frozen setup: PPO and deep hedging on every scenario, SAC on the two 10 bps scenarios,
+# 5 training seeds each. Finished runs are skipped, so this can be restarted.
 train:
-	@echo "train: not built yet (Phase 3)"; exit 1
+	$(PY) -m hedge.cli experiment --config config/experiments/scenarios_ppo.yaml --jobs $(JOBS)
+	$(PY) -m hedge.cli experiment --config config/experiments/scenarios_sac.yaml --jobs $(JOBS)
+	$(PY) -m hedge.cli experiment --config config/experiments/scenarios_deep_hedging.yaml --jobs $(JOBS)
 
+# Every strategy on validation paths, with bootstrap confidence intervals. Safe to repeat.
 eval:
-	@echo "eval: not built yet (Phase 4). This is the single test-path run after the agents-frozen tag."; exit 1
+	$(PY) -m hedge.cli eval --scenarios $(SCENARIOS) --split validation
 
+stress:
+	$(PY) -m hedge.cli stress --split validation
+
+# THE SINGLE TEST RUN. Needs the git tag `agents-frozen`. Do this once.
+final-test:
+	$(PY) -m hedge.cli eval --scenarios $(SCENARIOS) --split test --final-test-run
+	$(PY) -m hedge.cli stress --split test --final-test-run
+
+# Figures for docs/ and the small results sample the demo ships with.
 report:
-	@echo "report: not built yet (Phase 4)"; exit 1
+	$(PY) -m hedge.cli report
+	$(PY) -m hedge.cli export-sample
+
+# Needs DATABASE_URL, e.g. postgresql://localhost:5432/hedging
+db:
+	$(PY) -m hedge.cli db-load
+
+api:
+	uvicorn hedge.api.main:app --reload
 
 app:
-	@echo "app: not built yet (Phase 5)"; exit 1
+	streamlit run app/streamlit_app.py
 
-all: paths baselines train eval report
+all: paths baselines train eval stress report

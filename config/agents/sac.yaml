@@ -1,0 +1,16 @@
+# SAC on the same setup as ppo_tuned (delta-offset action, same network), default hyperparameters.
+# SAC does one gradient update per environment step, so on a CPU it runs about 10 times slower
+# per step than PPO; 100,000 steps here against PPO's 1,000,000.
+name: sac
+algo: sac
+total_steps: 100000
+n_envs: 1
+net_arch: [64, 64]
+hyperparams: {}        # stable-baselines3 defaults, including the 1,000,000-step replay buffer
+reward:
+  name: quadratic
+  lam: 1.0
+env:
+  action_mode: delta_offset
+  max_offset: 0.25
+eval_every: 10000

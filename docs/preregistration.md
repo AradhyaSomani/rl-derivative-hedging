@@ -121,6 +121,50 @@ added to test paths only.
    whole scenario, so the four cost levels share one file.
 9. **The band may trade to its edge** as well as to delta; the choice is tuned with the width.
 
+10. **Action range.** The agent's action is in [-1, 1] and is mapped linearly onto a holding
+    of 0 to 1 share, because stable-baselines3 works best with symmetric actions. The task
+    list says `Box(0, 1)`; the two are equivalent.
+11. **Step P&L uses a Black-Scholes mark of the option** (true volatility on GBM, current
+    variance on Heston). The marks cancel over an episode, so the total always equals the P&L
+    engine's; they only decide how the total is spread across steps for the rewards.
+12. **Reward definitions** (`hedge.env.rewards`), with gross = step P&L before costs:
+    - `quadratic`: -gross^2 - lambda * cost. The squared term is before costs so that costs
+      are not counted twice.
+    - `mean_variance`: pnl - (lambda / 2) * pnl^2, with pnl after costs.
+    - `terminal_cvar`: 0 until expiry, then -L - lambda * (w + max(L - w, 0) / 0.05), where L
+      is the episode's hedging cost and w is a fixed threshold. A single episode has no CVaR,
+      so this uses the Rockafellar-Uryasev form, whose average is an upper bound on CVaR 95%
+      that is tight when w equals the VaR.
+
+13. **Agent action.** The frozen agents output a correction of at most 0.25 shares around
+    the BS delta (`action_mode: delta_offset`) instead of the holding itself. Chosen on
+    validation CVaR (GBM 10 bps); both versions are reported in `docs/results.md`.
+14. **Frozen line-up** (`config/eval.yaml`): PPO with the tuned hyperparameters and the
+    quadratic reward at lambda 1, on all 8 scenarios; SAC with default hyperparameters on the
+    two 10 bps scenarios only; deep hedging on all 8. Five training seeds each (0 to 4).
+15. **Budgets.** PPO 1,000,000 steps. SAC 100,000 steps, because one SAC step costs about ten
+    PPO steps on a CPU. Deep hedging at most 1,000 gradient steps of 5,000 episodes with
+    early stopping on validation CVaR (patience 6 checks, one every 50 steps).
+16. **Hyperparameter search.** 30 Optuna trials for PPO on GBM 10 bps, one seed, scored on
+    validation CVaR, over learning rate, entropy coefficient, discount and a constant or
+    linear learning-rate schedule. No search for SAC, for deep hedging or on Heston.
+17. **Deep hedging loss**: CVaR 95% of the hedging cost over the batch. Same observations,
+    network size and action as the RL agents.
+18. **How a learned strategy is reported.** Each metric is the median over the 5 seeds, with
+    the minimum and maximum CVaR. The confidence interval for the CVaR gap to BS delta is a
+    paired bootstrap (2,000 resamples of the paths, seed 0) for the seed with the median
+    validation CVaR. The median seed is picked on validation, also for the test run.
+19. **"Matches deep hedging"** (question 3) means a CVaR 95% within 5% of deep hedging's.
+20. **Stress tests** (`config/eval.yaml`): volatility 30% and 10% on GBM, Heston paths for
+    GBM-trained agents, and jumps on GBM and Heston (intensity 2 per year, log-jump mean
+    -0.05, standard deviation 0.08, not compensated, so the jumps also pull the price down
+    a little on average). All at 10 bps, with the option premium kept at its unstressed value.
+21. **Not done:** TD3, DDPG, recurrent policies, a put as second contract and a non-zero
+    rate were planned or possible and are cut; see "What didn't work" in `docs/results.md`.
+22. **The final test run has not been made.** It is left for Aradhya, after reviewing this
+    section and tagging `agents-frozen`. Items 13 to 21 were written after the validation
+    results were known, so they record what was done; they are not predictions.
+
 ## 9. Changes after the tag
 
 None.

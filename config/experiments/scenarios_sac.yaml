@@ -1,0 +1,7 @@
+# Phase 3B: SAC against PPO on the two 10 bps scenarios, 5 training seeds.
+name: scenarios_sac
+agent: config/agents/sac.yaml
+scenarios:
+  - config/scenarios/gbm_10bps.yaml
+  - config/scenarios/heston_10bps.yaml
+seeds: [0, 1, 2, 3, 4]
