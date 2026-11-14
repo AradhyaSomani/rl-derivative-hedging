@@ -7,6 +7,11 @@ hyperparameters, band width, which seed is shown) was made on validation paths b
 those sections are labelled as validation. No strategy or setting was changed after seeing
 the test numbers.
 
+`make final-test` was run a second time later the same day, with nothing changed except
+documentation. It reproduced the first run exactly: every number in the saved result tables
+is identical, and only the recorded code commit differs. The numbers below are therefore
+those of both runs. See section 9 of `docs/preregistration.md`.
+
 ## Answers to the three questions (test paths)
 
 1. **Does an RL agent get a lower tail loss than delta hedging and the no-trade band, at the
@@ -202,6 +207,11 @@ Jumps: on average 2 per year, mean log-jump -5%, standard deviation 8%.
   training market, 15% at 30% volatility, 13% on Heston paths and 3% with jumps on GBM.
 - Jumps hurt every hedger by almost the same amount (about +4.7 on GBM). Nobody can hedge a
   jump by trading daily in the stock, learned or not.
+- **Caveat on jumps.** With jumps on GBM, deep hedging's CVaR worsens slightly more than
+  delta's (+4.714 against +4.676), so its edge over delta shrinks from 0.199 to 0.161, from
+  15% to 3%. Its CVaR is still the lowest of all strategies (5.884 against 6.045 for delta and
+  5.939 for the band), but what it learned gives little protection against a risk that was
+  absent from its training paths.
 - With jumps on Heston the RL agents do beat delta and the band (PPO 5.69 and SAC 5.62
   against 6.01 and 5.94; PPO's interval is -0.39 to -0.25). It is the one place where they
   are ahead of both baselines, and deep hedging is still lower (5.49).

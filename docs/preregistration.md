@@ -196,3 +196,9 @@ added to test paths only.
   paper (Buehler et al., 2019) in place of the textbook-style set in section 3. This was
   decided after the test results were known, so it is post hoc and will be labelled
   exploratory wherever it is reported. It changes no agent, setting or headline number.
+- **2026-11-14, second test run.** `make final-test` was run a second time, at commit
+  `588acf4`, with only documentation changed since the first run (commit `2defcfe`). The
+  saved result tables (`final_test.csv`, `final_test_table.csv`, `stress_test_table.csv`)
+  are identical to the first run's in every number; only the recorded code commit differs.
+  No strategy, config or setting was changed between or after the runs. The test paths have
+  now been scored twice, not once, and the results are the same.
