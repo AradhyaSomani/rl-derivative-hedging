@@ -262,9 +262,16 @@ tail gets much worse.
 | Paper Heston (trained on GBM 10 bps) | PPO | 1.376 | 4.586 | -0.039 (-0.079, -0.001) |
 | Paper Heston (trained on GBM 10 bps) | SAC | 1.398 | 4.645 | +0.020 (-0.015, +0.058) |
 | Paper Heston (trained on GBM 10 bps) | Deep hedging | 1.153 | 4.445 | -0.180 (-0.233, -0.125) |
+| Paper Heston + jumps (trained on Heston 10 bps) | BS delta | 1.557 | 8.866 | |
+| Paper Heston + jumps (trained on Heston 10 bps) | No-trade band | 1.514 | 8.706 | -0.160 (-0.187, -0.131) |
+| Paper Heston + jumps (trained on Heston 10 bps) | PPO | 1.634 | 8.702 | -0.164 (-0.221, -0.111) |
+| Paper Heston + jumps (trained on Heston 10 bps) | SAC | 1.580 | 8.890 | +0.024 (-0.077, +0.125) |
+| Paper Heston + jumps (trained on Heston 10 bps) | Deep hedging | 1.384 | 7.539 | -1.327 (-1.447, -1.221) |
 
 Medians over the five training seeds; the interval is the bootstrap interval of the seed with
-the median CVaR, as in the other tables. No-hedge is left out (CVaR 7.25 and 7.22).
+the median CVaR, as in the other tables. No-hedge is left out (CVaR 7.25, 7.22 and 8.63). The jumps are the preregistered
+`jumps_heston` settings (on average 2 a year, mean log-jump -5%, standard deviation 8%),
+added on top of the paper's paths, so all three preregistered Heston stresses are repeated.
 
 **What it shows.**
 
@@ -280,6 +287,20 @@ the median CVaR, as in the other tables. No-hedge is left out (CVaR 7.25 and 7.2
   and with realised volatility mostly far below the 20% everyone assumed, holding less of the
   stock costs less.
 - SAC is worse than delta on the Heston-trained agents, as on every other path set.
+- With jumps added, deep hedging is the only strategy that clearly helps: CVaR 7.539 against
+  8.866 for delta (15% lower, interval well clear of zero), while delta, the band, PPO and SAC
+  all land between 8.70 and 8.89, no better than not hedging at all (8.626; the interval of
+  no-hedge against delta, -0.88 to +0.39, covers zero). A likely reason, checked on validation
+  paths: with the variance near zero, BS delta snaps to
+  holdings of 0 or 1 (45% of its holdings are above 0.95), so a jump hits a full position.
+  Deep hedging is above 0.95 only about 1% of the time and holds less stock overall (on the
+  paths without jumps, a mean of 0.59 shares against delta's 0.67), which is also consistent with the under-hedging guess for
+  PPO above.
+- Why the gaps shrink without jumps: on dev seeds, a BS delta hedge sold at the fair price
+  with no costs already has a CVaR of 5.08 under the paper's parameters, against 1.23 under
+  the textbook set; costs add only about 0.2. Most of the extra tail is volatility risk that
+  no hedge in the stock alone can remove. The paper itself also trades a variance swap,
+  which this project does not offer.
 
 **Limits.** The hedgers were never shown anything like these paths, and the premium is priced
 under the wrong model, so this measures robustness to a badly mis-specified market, not how

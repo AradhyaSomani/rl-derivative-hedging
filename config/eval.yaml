@@ -48,3 +48,7 @@ exploratory_stress:
     base: config/scenarios/gbm_10bps.yaml
     paths_from: config/scenarios/heston_10bps.yaml
     market: {kappa: 1.0, xi: 2.0}
+  jumps_heston_paper:    # as jumps_heston (same preregistered jump settings), on the paper's paths
+    base: config/scenarios/heston_10bps.yaml
+    market: {kappa: 1.0, xi: 2.0}
+    jumps: {intensity: 2.0, mean: -0.05, std: 0.08}

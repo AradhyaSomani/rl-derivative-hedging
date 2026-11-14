@@ -103,7 +103,11 @@ def test_exploratory_paper_heston_paths():
 
     cfg = load_eval_config()
     # The exploratory stresses live in their own section, apart from the preregistered ones.
-    assert set(cfg["exploratory_stress"]) == {"heston_paper", "model_swap_paper"}
+    assert set(cfg["exploratory_stress"]) == {
+        "heston_paper",
+        "model_swap_paper",
+        "jumps_heston_paper",
+    }
     assert not set(cfg["exploratory_stress"]) & set(cfg["stress"])
 
     base, paper = stressed_paths(
