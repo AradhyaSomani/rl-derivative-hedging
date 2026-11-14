@@ -1,0 +1,13 @@
+{
+  "strategy": "sac_quadratic_l1",
+  "scenario": "heston_10bps",
+  "seed": 1,
+  "n_paths": 10000,
+  "mean_cost": 0.2377280223039229,
+  "std_cost": 0.5831524436244221,
+  "var95": 1.2126528760268367,
+  "cvar95": 1.5968758578925422,
+  "mean_txn_cost": 0.2434931340421099,
+  "mean_turnover": 2.4058356470726814,
+  "split": "validation"
+}

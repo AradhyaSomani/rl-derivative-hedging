@@ -3,31 +3,35 @@
 Does a reinforcement-learning agent hedge a short option more cheaply, and with less tail risk,
 than textbook delta hedging once trading costs exist and the market model is wrong?
 
-**Finding so far (validation paths, provisional):** a deep hedging network cuts tail risk
-(CVaR 95%) by 11% to 19% against Black-Scholes delta hedging in all eight scenarios and also
-beats a tuned no-trade band. The reinforcement-learning agents (PPO, SAC) make the hedge about
-12% cheaper on average at 10 basis points but not safer: they do not beat the band anywhere.
+**Finding (10,000 held-out test paths per scenario, scored once):** a deep hedging network
+cuts tail risk (CVaR 95%) by 10% to 18% against Black-Scholes delta hedging in all eight
+scenarios, at the same or a lower average cost, and also beats a tuned no-trade band. The
+reinforcement-learning agents (PPO, SAC) make the hedge 7% to 12% cheaper on average at 10
+basis points but not safer: they do not beat delta on tail risk in any scenario, and the band
+beats them everywhere.
 
 ![Hedging cost distribution on Heston paths at 10 basis points](docs/figures/histogram_heston_10bps.png)
 
-CVaR 95% of hedging cost at 10 basis points, 10,000 validation paths, median of 5 training
-seeds for the learned strategies (lower is better):
+CVaR 95% of hedging cost at 10 basis points on the test paths, median of 5 training seeds for
+the learned strategies (lower is better):
 
 | Strategy | GBM | Heston |
 | --- | --- | --- |
-| BS delta | 1.368 | 1.557 |
-| No-trade band (tuned) | 1.305 | 1.514 |
-| PPO | 1.376 | 1.634 |
-| SAC | 1.398 | 1.580 |
-| **Deep hedging** | **1.153** | **1.384** |
+| BS delta | 1.369 | 1.552 |
+| No-trade band (tuned) | 1.322 | 1.503 |
+| PPO | 1.396 | 1.629 |
+| SAC | 1.408 | 1.602 |
+| **Deep hedging** | **1.170** | **1.376** |
 
-The full table with confidence intervals, the stress tests and everything that did not work
-are in [docs/results.md](docs/results.md). The plan written before the experiments is in
-[docs/preregistration.md](docs/preregistration.md).
+The full table with confidence intervals, the stress tests, the comparison of validation with
+test, and everything that did not work are in [docs/results.md](docs/results.md). The plan is
+in [docs/preregistration.md](docs/preregistration.md).
 
-**Status.** These numbers are on validation paths. The test paths (seeds 10,000 to 19,999)
-have never been generated. The final run on them is one command, `make final-test`, which
-refuses to start until the git tag `agents-frozen` exists.
+**How the test set was kept clean.** Every choice was made on validation paths. The test
+paths (seeds 10,000 to 19,999) did not exist until the setup was committed and tagged
+`agents-frozen`; the code refuses to generate or load them before that. They were then scored
+once, on 2026-11-14. One validation result did not survive: PPO looked better than delta at
+20 basis points on GBM, and on test it is not.
 
 ## Setup
 
@@ -56,7 +60,8 @@ records the config hashes, the path-file hash, the seed and the git commit.
 | All of the above | `make all` | about 2 hours |
 | The single test run, after tagging `agents-frozen` | `make final-test` | about 2 minutes |
 
-No GPU is needed. One PPO run (1,000,000 steps) takes about 450 seconds, one SAC run (100,000
+The validation table was reproduced digit for digit on a second machine (Linux with Python
+3.13 and macOS with Python 3.14) from the same trained weights. No GPU is needed. One PPO run (1,000,000 steps) takes about 450 seconds, one SAC run (100,000
 steps) about 670 seconds and one deep hedging run about 100 seconds. The choices that led to
 the frozen setup (reward grid, action space, hyperparameter search) can be rerun from the
 other files in `config/experiments/` with

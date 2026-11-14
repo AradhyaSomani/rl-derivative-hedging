@@ -113,7 +113,9 @@ def export_sample(sample_dir: Path = SAMPLE_DIR) -> list[Path]:
     """Copy what the demo needs into ``app/sample``: tables, median-seed costs, steps, models."""
     source = FULL_DIR
     split = available_split(source)
-    sample_dir.mkdir(parents=True, exist_ok=True)
+    if sample_dir.exists():  # rebuilt from scratch, so files of an earlier split do not linger
+        shutil.rmtree(sample_dir)
+    sample_dir.mkdir(parents=True)
     written = []
     for name in (f"final_{split}.csv", f"final_{split}_table.csv", f"stress_{split}_table.csv"):
         if (source / name).exists():

@@ -1,8 +1,10 @@
 # Pre-registration
 
-**Status: DRAFT, not yet tagged.** Aradhya reviews this, settles the items in section 8, then
-commits and tags `prereg-v1`. After the tag, sections 1 to 6 change only through a dated entry
-in section 9.
+**Status: tagged `prereg-v1` and `agents-frozen` on 2026-11-14**, both on the commit that
+holds the validation results, and before the test paths were generated. The tag therefore
+shows that the plan and the setup were fixed before the test run, not before the validation
+experiments; section 8, item 22 says which items were written after validation results were
+known. Changes since the tag are in section 9.
 
 ## 1. Questions
 
@@ -167,4 +169,14 @@ added to test paths only.
 
 ## 9. Changes after the tag
 
-None.
+- **2026-11-14, the test run.** `make final-test` was run once. Results are in
+  `docs/results.md`. No strategy, config or setting was changed afterwards.
+- **2026-11-14, correction to section 8, item 18.** Its last sentence says the seed whose
+  confidence interval is reported is picked on validation, also for the test run. The code
+  that ran does something slightly different: on each split it reports the seed whose CVaR is
+  the median of the five on that split. The rule is the median, not the best, so it does not
+  favour any strategy, and the medians over seeds in the tables do not depend on it. The run
+  was not repeated.
+- **2026-11-14, code change after the tag.** `python -m hedge.cli export-sample` now empties
+  `app/sample` before writing, so the demo's sample holds only the test results. This does
+  not touch any result.
