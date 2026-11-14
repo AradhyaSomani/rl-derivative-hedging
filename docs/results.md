@@ -12,6 +12,10 @@ documentation. It reproduced the first run exactly: every number in the saved re
 is identical, and only the recorded code commit differs. The numbers below are therefore
 those of both runs. See section 9 of `docs/preregistration.md`.
 
+One section, right after Phase 4, is **exploratory**: a stress test with the deep hedging
+paper's Heston parameters, decided after the test results were known and run on validation
+paths. It is labelled as such and does not change anything else in this file.
+
 ## Answers to the three questions (test paths)
 
 1. **Does an RL agent get a lower tail loss than delta hedging and the no-trade band, at the
@@ -219,6 +223,74 @@ Jumps: on average 2 per year, mean log-jump -5%, standard deviation 8%.
   (1.376), so most of what it learned carries over.
 - At 10% volatility every CVaR is negative: the option was sold at a 20% volatility price,
   so even the bad tail is a profit.
+
+## Exploratory: Heston with the deep hedging paper's parameters (validation, post hoc)
+
+**Exploratory, not preregistered.** This stress test was decided after the test results were
+known (section 9 of `docs/preregistration.md`). It changes no agent, setting or number above,
+and nothing was retrained or tuned for it. Read it as a robustness check, not as evidence for
+or against any hypothesis.
+
+**What changed.** Only the price paths. They are drawn from the Heston parameters of Buehler,
+Gonon, Teichmann and Wood (2019), "Deep hedging", *Quantitative Finance* 19(8), section 5.2:
+alpha = 1, b = 0.04, sigma = 2, v0 = 0.04, rho = -0.7, s0 = 100 (checked against the arXiv
+version, 1802.03042). In this repo's names that is kappa = 1 and xi = 2 instead of 2 and 0.3;
+v0, theta and rho are the same. Everything else stays as in the base scenario: 30 trading days
+at 252 a year (the paper uses 30/365), 10 bps, the at-the-money call, the premium (the textbook
+Heston price, 2.721) and the hedgers' beliefs (BS delta's 20% volatility, the band's width, the
+agents' weights). Paths use the validation seeds (20,000 to 29,999), so the test seeds are not
+touched again; the "before" column is the same validation numbers as the preregistered stress
+tests.
+
+**What these paths look like.** A volatility of variance of 2 is extreme: the variance sits at
+zero on 53% of steps, median realised volatility over the 30 days is 8.9% (19.3% under the
+textbook set), and the 30-day log return has skewness -4.0 and excess kurtosis 28 (-0.5 and
+0.6). The fair price of the call under these parameters is 1.882 (semi-analytic; the simulated
+paths give 1.877, so the Euler scheme is not visibly biased here), against the 2.721 premium the
+hedger collects. That is why every strategy's average cost is negative (-0.6 to -0.9) while its
+tail gets much worse.
+
+| Stress test | Strategy | CVaR 95% before | CVaR 95% under stress | CVaR vs delta (95% CI) |
+|---|---|---|---|---|
+| Paper Heston (trained on Heston 10 bps) | BS delta | 1.557 | 4.500 | |
+| Paper Heston (trained on Heston 10 bps) | No-trade band | 1.514 | 4.520 | +0.020 (-0.008, +0.049) |
+| Paper Heston (trained on Heston 10 bps) | PPO | 1.634 | 4.211 | -0.289 (-0.314, -0.267) |
+| Paper Heston (trained on Heston 10 bps) | SAC | 1.580 | 4.782 | +0.281 (+0.098, +0.464) |
+| Paper Heston (trained on Heston 10 bps) | Deep hedging | 1.384 | 4.251 | -0.249 (-0.317, -0.182) |
+| Paper Heston (trained on GBM 10 bps) | BS delta | 1.368 | 4.625 | |
+| Paper Heston (trained on GBM 10 bps) | No-trade band | 1.305 | 4.456 | -0.169 (-0.204, -0.134) |
+| Paper Heston (trained on GBM 10 bps) | PPO | 1.376 | 4.586 | -0.039 (-0.079, -0.001) |
+| Paper Heston (trained on GBM 10 bps) | SAC | 1.398 | 4.645 | +0.020 (-0.015, +0.058) |
+| Paper Heston (trained on GBM 10 bps) | Deep hedging | 1.153 | 4.445 | -0.180 (-0.233, -0.125) |
+
+Medians over the five training seeds; the interval is the bootstrap interval of the seed with
+the median CVaR, as in the other tables. No-hedge is left out (CVaR 7.25 and 7.22).
+
+**What it shows.**
+
+- Every hedger's CVaR roughly triples, from about 1.2 to 1.6 to about 4.2 to 4.8. The
+  ordering seen everywhere else mostly survives, but the gaps shrink to a few percent.
+- Deep hedging is still below delta in both cases (5.5% and 3.9%), but its lead over the band
+  is gone when it was trained on GBM (4.445 against 4.456, inside each other's noise), and on
+  Heston the band itself no longer beats delta.
+- PPO trained on Heston has the lowest median CVaR here (4.211, 6.4% below delta), slightly
+  below deep hedging's 4.251. Its five seeds range from 3.975 to 4.379, which overlaps deep
+  hedging's 4.209 to 4.284, so this is not a clear win; it is the one place in the project
+  where PPO is not behind. A plausible reason, untested: PPO under-hedges relative to delta,
+  and with realised volatility mostly far below the 20% everyone assumed, holding less of the
+  stock costs less.
+- SAC is worse than delta on the Heston-trained agents, as on every other path set.
+
+**Limits.** The hedgers were never shown anything like these paths, and the premium is priced
+under the wrong model, so this measures robustness to a badly mis-specified market, not how
+each method would do if trained on it. The paper trains on its own parameters; doing that here
+would be a new experiment, not a stress test. Daily rebalancing with a volatility process that
+spends half its time at zero is also a regime where the Euler scheme and the full-truncation
+fix matter more than usual, although the price check above suggests the bias is small.
+
+Reproduce: `python -m hedge.cli stress --split validation --exploratory` (about 20 seconds
+with the trained runs in `data/runs`). Results: `data/results/stress_exploratory_validation.csv`
+and `stress_exploratory_validation_table.csv`. The preregistered stress files are not touched.
 
 ## Validation table (used for every choice before the freeze)
 

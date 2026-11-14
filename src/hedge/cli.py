@@ -173,7 +173,9 @@ def cmd_eval(args: argparse.Namespace) -> None:
 def cmd_stress(args: argparse.Namespace) -> None:
     from hedge.eval.stress import run_stress_tests
 
-    table = run_stress_tests(args.split, allow_test=args.final_test_run)
+    table = run_stress_tests(
+        args.split, allow_test=args.final_test_run, exploratory=args.exploratory
+    )
     cols = ["stress_test", "strategy", "n_seeds", "cvar95_base", "cvar95", "cvar95_worsening"]
     print(table[cols].to_string(index=False, float_format=lambda x: f"{x:.4f}"))
 
@@ -258,6 +260,11 @@ def main(argv: list[str] | None = None) -> None:
     p = sub.add_parser("stress", help="stress tests: volatility shock, model swap, jumps")
     p.add_argument("--split", default="validation", choices=["validation", "test"])
     p.add_argument("--final-test-run", **final)
+    p.add_argument(
+        "--exploratory",
+        action="store_true",
+        help="run the post-hoc exploratory stresses (separate output files)",
+    )
     p.set_defaults(func=cmd_stress)
 
     p = sub.add_parser("db-load", help="rebuild the PostgreSQL experiment record from files")

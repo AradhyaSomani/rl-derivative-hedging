@@ -96,3 +96,31 @@ def test_stressed_paths():
 
     with pytest.raises(TestSeedError):
         stressed_paths("x", {"base": "config/scenarios/gbm_10bps.yaml", "jumps": {}}, "test")
+
+
+def test_exploratory_paper_heston_paths():
+    from hedge.eval.final import load_eval_config
+
+    cfg = load_eval_config()
+    # The exploratory stresses live in their own section, apart from the preregistered ones.
+    assert set(cfg["exploratory_stress"]) == {"heston_paper", "model_swap_paper"}
+    assert not set(cfg["exploratory_stress"]) & set(cfg["stress"])
+
+    base, paper = stressed_paths(
+        "heston_paper", cfg["exploratory_stress"]["heston_paper"], "validation"
+    )
+    # The hedger keeps the textbook parameters it was trained with; only the paths change.
+    assert (base.market["kappa"], base.market["xi"]) == (2.0, 0.3)
+    assert paper.variances is not None
+    clean = pathsets.simulate(base, paper.seeds[:2_000])
+    np.testing.assert_array_equal(paper.prices[:2_000, 0], clean.prices[:, 0])
+    # Volatility of variance 2 instead of 0.3: variance paths are far more dispersed and
+    # often hit zero.
+    assert paper.variances[:2_000, -1].std() > 3 * clean.variances[:, -1].std()
+    assert (paper.variances[:2_000, -1] == 0).mean() > 0.05
+
+    base, swapped = stressed_paths(
+        "model_swap_paper", cfg["exploratory_stress"]["model_swap_paper"], "validation"
+    )
+    assert base.model == "gbm" and swapped.variances is None
+    np.testing.assert_array_equal(swapped.prices[:2_000], paper.prices[:2_000])

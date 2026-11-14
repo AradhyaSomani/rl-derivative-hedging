@@ -31,3 +31,20 @@ stress:
   jumps_heston:
     base: config/scenarios/heston_10bps.yaml
     jumps: {intensity: 2.0, mean: -0.05, std: 0.08}
+
+# EXPLORATORY, post hoc (preregistration section 9): added after the test results were known.
+# Run with `python -m hedge.cli stress --exploratory`; results go to
+# data/results/stress_exploratory_{split}*.csv and never replace the stress results above.
+# Heston paths with the parameters of Buehler, Gonon, Teichmann and Wood (2019), "Deep
+# hedging", Quantitative Finance 19(8), section 5.2: alpha = 1, b = 0.04, sigma = 2,
+# v0 = 0.04, rho = -0.7, s0 = 100. In this repo's names that is kappa = 1, theta = 0.04,
+# xi = 2, v0 = 0.04, rho = -0.7, so only kappa and xi differ from heston_10bps.
+# The time grid stays this repo's (30 trading days, 252 per year), and the cost stays 10 bps.
+exploratory_stress:
+  heston_paper:          # agents trained on heston_10bps, paths with the paper's parameters
+    base: config/scenarios/heston_10bps.yaml
+    market: {kappa: 1.0, xi: 2.0}
+  model_swap_paper:      # agents trained on gbm_10bps, paths with the paper's parameters
+    base: config/scenarios/gbm_10bps.yaml
+    paths_from: config/scenarios/heston_10bps.yaml
+    market: {kappa: 1.0, xi: 2.0}

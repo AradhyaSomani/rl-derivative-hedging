@@ -202,3 +202,12 @@ added to test paths only.
   are identical to the first run's in every number; only the recorded code commit differs.
   No strategy, config or setting was changed between or after the runs. The test paths have
   now been scored twice, not once, and the results are the same.
+- **2026-11-14, exploratory stress test run.** The stress test planned above was added as a
+  separate `exploratory_stress` section of `config/eval.yaml` and run with
+  `python -m hedge.cli stress --split validation --exploratory`. It uses the parameters of
+  Buehler et al. (2019), section 5.2 (alpha = 1, b = 0.04, sigma = 2, v0 = 0.04, rho = -0.7),
+  that is kappa = 1 and xi = 2 here, on two stresses: agents trained on Heston 10 bps, and
+  agents trained on GBM 10 bps. It runs on validation seeds, so the test seeds were not used
+  again. No agent was retrained, no setting changed, and the preregistered stress results are
+  in separate files that it does not write to. Results are in `docs/results.md` under
+  "Exploratory".
