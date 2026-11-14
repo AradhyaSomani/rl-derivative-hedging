@@ -207,11 +207,11 @@ P&L) of the BS delta hedge at 10 bps on the 20 development paths with seeds 0 to
 payoff = torch.relu(paths[:, -1] - K)
 gain = (h * (paths[:, 1:] - paths[:, :-1])).sum(dim=1)
 flat = torch.zeros_like(h[:, :1])
-trades = torch.diff(torch.cat([flat, h, flat], dim=1), dim=1)   # includes buy at 0, sell at N
+trades = torch.diff(torch.cat([flat, h, flat], dim=1), dim=1)  # includes buy at 0, sell at N
 costs = kappa * (paths * trades.abs()).sum(dim=1)
-cost = -(premium - payoff + gain - costs)                         # hedging cost per path
+cost = -(premium - payoff + gain - costs)  # hedging cost per path
 k = math.ceil(0.05 * B)
-loss = torch.topk(cost, k).values.mean()                         # CVaR 95% of the batch
+loss = torch.topk(cost, k).values.mean()  # CVaR 95% of the batch
 loss.backward()
 ```
 
